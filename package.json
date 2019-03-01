@@ -1,5 +1,5 @@
 {
-  "name": "music-key",
+  "name": "scoreit",
   "version": "0.1.0",
   "description": "A score editor web component.",
   "main": "dist/api.js",
