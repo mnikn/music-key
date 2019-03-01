@@ -4,5 +4,7 @@ export class Note {
     public sectionId: number;
     public length: 4 | 8 | 16 | 32 = 4;
 
-    constructor(public id?: number) { }
+    constructor(public id?: number, sectionId?: number) {
+        this.sectionId = sectionId;
+    }
 }

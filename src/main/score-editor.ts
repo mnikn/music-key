@@ -8,19 +8,19 @@ import { Note } from 'src/models/note';
 import { Mousetrap } from 'src/utils/mousetrap';
 import { Position } from 'src/utils/position';
 import { SectionLayouter } from './section-layouter';
+import generateId from 'src/utils/id-generator';
 
 export class ScoreEditor {
     public element: d3.Selection<SVGSVGElement, {}, HTMLElement, any>;
     private cursor: Cursor;
     private sectionLayouter: SectionLayouter = new SectionLayouter(this);
-    private nextNoteId: number = 1;
 
     constructor(parentElement: HTMLElement, public score: Score = new Score()) {
         this.element = d3.select(parentElement)
             .append('svg')
             .attr('id', 'score-content')
             .style('height', '800px')
-            .style('width', '1200px');
+            .style('width', '100%');
 
         Mousetrap
             .shortcut('up', () => {
@@ -32,21 +32,24 @@ export class ScoreEditor {
             }).shortcut('right', () => {
                 this.cursor.moveRight();
             }).shortcut('backspace', () => {
-                // this.removeSelectingNote();
+                this.removeSelectingNote();
             });
 
         window.addEventListener('keydown', this.handleKeydown.bind(this));
+        window.addEventListener('resize', () => {
+            this.render();
+            this.cursor.moveTo(this.cursor.currentNote);
+        });
 
         this.refresh();
     }
 
     public refresh() {
-        this.nextNoteId = 1;
 
         const score = this.score;
         const sections = score.sections;
-        sections.push(new Section(this.score.sections.length + 1));
-        sections[0].notes.push(new Note(this.nextNoteId++));
+        sections.push(new Section(generateId()));
+        sections[0].notes.push(new Note(generateId(), sections[0].id));
         this.element.selectAll('*').remove();
 
         this.cursor = new Cursor(this);
@@ -86,11 +89,11 @@ export class ScoreEditor {
             selectingNote.key = key;
             if (selectingSection.isLastNote(selectingNote)) {
                 if (selectingSection.notes.length !== this.score.timeSignature.beatPerSections) {
-                    const newNote = new Note(this.nextNoteId++);
+                    const newNote = new Note(generateId(), selectingSection.id);
                     selectingSection.notes.push(newNote);
                 } else if (this.score.isLastSection(selectingSection)) {
                     const newSection = new Section(this.score.sections.length + 1);
-                    newSection.notes.push(new Note(this.nextNoteId++));
+                    newSection.notes.push(new Note(generateId(), selectingSection.id));
                     this.score.sections.push(newSection);
                 }
             }
@@ -161,5 +164,20 @@ export class ScoreEditor {
             .style('font-size', `16px`);
 
         this.sectionLayouter.relayout(seciontElement);
+    }
+
+    private removeSelectingNote() {
+        if(!this.cursor.currentNote) return;
+
+        let needRemoveNote = _.cloneDeep(this.cursor.currentNote);
+        let selectingSection = this.cursor.currentSection;
+        selectingSection.notes = selectingSection.notes.filter(note => note.id !== needRemoveNote.id);
+        if (selectingSection.notes.length === 0) {
+            let i = _.indexOf(this.score.sections, selectingSection);
+            this.score.sections = _.remove(this.score.sections, section => section.id !== selectingSection.id);  
+            selectingSection = this.score.sections[i-1] ? this.score.sections[i-1] : new Section(generateId());
+        }
+        this.cursor.moveTo(_.last(selectingSection.notes));
+        this.render();
     }
 }
