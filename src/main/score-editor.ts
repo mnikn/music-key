@@ -1,5 +1,6 @@
 import * as d3 from 'd3';
 import * as _ from 'lodash';
+// import * as $ from 'jquery';
 
 import { Cursor } from './cursor';
 import { Score } from 'src/models/score';
@@ -9,18 +10,25 @@ import { Mousetrap } from 'src/utils/mousetrap';
 import { Position } from 'src/utils/position';
 import { SectionLayouter } from './section-layouter';
 import generateId from 'src/utils/id-generator';
+import Toolbar from './toolbar';
+import '../../static/css/style.css';
 
 export class ScoreEditor {
     public element: d3.Selection<SVGSVGElement, {}, HTMLElement, any>;
     private cursor: Cursor;
+    private toolbar: Toolbar;
     private sectionLayouter: SectionLayouter = new SectionLayouter(this);
 
     constructor(parentElement: HTMLElement, public score: Score = new Score()) {
+        this.toolbar = new Toolbar(parentElement);
         this.element = d3.select(parentElement)
             .append('svg')
             .attr('id', 'score-content')
             .style('height', '800px')
             .style('width', '100%');
+        document.oncontextmenu = (event) => {
+            return false;
+        };
 
         Mousetrap
             .shortcut('up', () => {

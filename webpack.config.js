@@ -11,6 +11,9 @@ module.exports = {
         rules: [{
             test: /\.ts$/,
             loader: 'awesome-typescript-loader'
+        }, {
+            test: /\.css$/,
+            loader: 'style-loader!css-loader'
         }]
     },
     resolve: {
