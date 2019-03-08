@@ -68,7 +68,7 @@ export class ScoreEditor {
         window.addEventListener('keydown', this.handleKeydown.bind(this));
         window.addEventListener('resize', () => {
             this.render();
-            this.cursor.moveTo(this.cursor.currentNote);
+            this.cursor.moveTo(this.cursor.getSelectingNote());
         });
 
         this.contextMenu = new ContextMenu(this);
@@ -83,8 +83,8 @@ export class ScoreEditor {
         sections[0].notes.push(new Note(generateId(), sections[0].id));
         this.element.selectAll('*').remove();
 
-        this.cursor = new Cursor(this);
-        this.cursor.currentSection = sections[0];
+        this.cursor = new Cursor(score, this.element.node());
+        // this.cursor.currentSection = sections[0];
 
 
         this.element
@@ -176,8 +176,8 @@ export class ScoreEditor {
     }
 
     public replaceSelectingNote(note: Note) {
-        const selectingSection = this.cursor.currentSection;
-        const selectingNote = this.cursor.currentNote;
+        const selectingSection = this.cursor.getSelectingSection();
+        const selectingNote = this.cursor.getSelectingNote();
         selectingNote.key = note.key;
         if (selectingSection.isLastNote(selectingNote)) {
             if (selectingSection.notes.length !== this.score.timeSignature.beatPerSections) {
@@ -185,7 +185,7 @@ export class ScoreEditor {
                 selectingSection.notes.push(newNote);
             } else if (this.score.isLastSection(selectingSection)) {
                 const newSection = new Section(this.score.sections.length + 1);
-                newSection.notes.push(new Note(generateId(), selectingSection.id));
+                newSection.notes.push(new Note(generateId(), newSection.id));
                 this.score.sections.push(newSection);
             }
         }
@@ -194,10 +194,10 @@ export class ScoreEditor {
     }
 
     private removeSelectingNote() {
-        if (!this.cursor.currentNote) return;
+        if (!this.cursor.getSelectingNote()) return;
 
-        let needRemoveNote = _.cloneDeep(this.cursor.currentNote);
-        let selectingSection = this.cursor.currentSection;
+        let needRemoveNote = _.cloneDeep(this.cursor.getSelectingNote());
+        let selectingSection = this.cursor.getSelectingSection();
         selectingSection.notes = selectingSection.notes.filter(note => note.id !== needRemoveNote.id);
         if (selectingSection.notes.length === 0) {
             let i = _.indexOf(this.score.sections, selectingSection);
