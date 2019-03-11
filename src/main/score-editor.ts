@@ -8,7 +8,7 @@ import { Note } from 'src/models/note';
 import { Mousetrap } from 'src/utils/mousetrap';
 import { Position } from 'src/utils/position';
 import { SectionLayouter } from './section-layouter';
-import ContextMenu from './context-menu';
+import ContextMenu from 'src/controllers/context-menu';
 import generateId from 'src/utils/id-generator';
 import Toolbar from './toolbar';
 import '../../static/css/style.css';
@@ -41,7 +41,7 @@ export class ScoreEditor {
         document.onclick = (event: any) => {
             let isContextMenuClick = false;
             _.forEach(event.path, element => {
-                if (element.id === this.contextMenu.element.node().id) {
+                if (element.id === this.contextMenu.view.element.node().id) {
                     isContextMenuClick = true;
                 }
             });

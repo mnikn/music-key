@@ -1,39 +1,32 @@
+import * as _ from 'lodash';
 import * as d3 from 'd3';
-import { ScoreEditor } from './score-editor';
+
 import { Position } from 'src/utils/position';
-import { Note } from 'src/models/note';
+import Messager from 'src/utils/messager';
 
-export default class ContextMenu {
-
-    public element: d3.Selection<HTMLElement, {}, HTMLElement, any>;
+export default class ContextMenuView {
     private buttons: any[] = [];
-    constructor(private editor: ScoreEditor) {
+    private _changeNoteEvents = new Messager();
+    public element: d3.Selection<HTMLElement, {}, HTMLElement, any>;
+
+    constructor(parentElement: HTMLElement) {
         let self = this;
-        this.element = editor.rootElement.append('div')
+        this.element = d3.select(parentElement).append('div')
             .attr('id', 'context-menu')
             .attr('class', 'btn-group-vertical dropright show')
             .style('position', 'absolute')
             .style('z-index', '100');
-        
-        this.buttons =  [{
+
+        this.buttons = [{
             id: 'changeNote',
             title: 'change note to',
             type: 'group',
-            items: [{
-                title: '0',
-                action: () => {
-                    let newNote = new Note();
-                    newNote.key = '0';
-                    this.changeNote(newNote);
-                }
-            }, {
-                title: '1',
-                action: () => {
-                    let newNote = new Note();
-                    newNote.key = '1';
-                    this.changeNote(newNote);
-                }
-            }]
+            items: _.range(0, 8).map(num => {
+                return {
+                    key: num,
+                    title: num
+                };
+            })
         }, {
             title: 'connectTo...'
         }];
@@ -59,9 +52,10 @@ export default class ContextMenu {
                     .enter().append('button')
                     .attr('class', 'btn btn-secondary dropdown-item')
                     .text((data: any) => data.title)
-                    .on('click', function() {
+                    .on('click', function () {
                         let data: any = d3.select(this).data()[0];
-                        data.action.call(self);
+                        self._changeNoteEvents.notify('changeNote', data.key);
+                        self.close();
                     });
             } else {
                 this.element.append('button')
@@ -76,6 +70,10 @@ export default class ContextMenu {
         this.close();
     }
 
+    public registerChangeNoteClick(callback: (key: string) => void) {
+        this._changeNoteEvents.register('changeNote', callback);
+    }
+
     public show(pos: Position) {
         this.element
             .style('left', `${pos.x + 10}px`)
@@ -85,10 +83,5 @@ export default class ContextMenu {
 
     public close() {
         this.element.style('visibility', 'hidden');
-    }
-
-    private changeNote(note: Note) {
-        this.editor.replaceSelectingNote(note);
-        this.close();
     }
 }
