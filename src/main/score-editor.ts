@@ -1,7 +1,7 @@
 import * as d3 from 'd3';
 import * as _ from 'lodash';
 
-import { Cursor } from './cursor';
+import Cursor from '../controllers/cursor';
 import { Score } from 'src/models/score';
 import { Section } from 'src/models/section';
 import { Note } from 'src/models/note';
@@ -83,9 +83,7 @@ export class ScoreEditor {
         sections[0].notes.push(new Note(generateId(), sections[0].id));
         this.element.selectAll('*').remove();
 
-        this.cursor = new Cursor(score, this.element.node());
-        // this.cursor.currentSection = sections[0];
-
+        this.cursor = new Cursor(this.element.node(), score);
 
         this.element
             .append('text')

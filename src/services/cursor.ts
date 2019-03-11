@@ -3,12 +3,16 @@ import * as _ from 'lodash';
 import { Note } from "src/models/note";
 import { Section } from "src/models/section";
 import { Score } from "src/models/score";
+import Service from './service';
 
-export default class CursorService {
+export default class CursorService extends Service {
     private selectingNote: Note;
     private selectingSection: Section;
 
+    public static readonly ACTION_MOVE = 'move';
+
     constructor(public score: Score) {
+        super();
         this.selectingSection = this.score.sections[0];
         this.selectingNote = this.score.sections[0].notes[0];
     }
@@ -42,6 +46,8 @@ export default class CursorService {
             this.selectingSection = this.score.sections[currentSectionIndex - 1];
             this.selectingNote = _.last(this.selectingSection.notes);
         }
+
+        this.notify(CursorService.ACTION_MOVE, this.selectingNote);
         return this.selectingNote;
     }
 
@@ -59,6 +65,7 @@ export default class CursorService {
             this.selectingNote = this.selectingSection.notes[0];
         }
 
+        this.notify(CursorService.ACTION_MOVE, this.selectingNote);
         return this.selectingNote;
     }
 
@@ -72,6 +79,7 @@ export default class CursorService {
             this.selectingNote = this.selectingSection.notes[0];
         }
 
+        this.notify(CursorService.ACTION_MOVE, this.selectingNote);
         return this.selectingNote;
     }
 
@@ -85,6 +93,7 @@ export default class CursorService {
             this.selectingNote = this.selectingSection.notes[0];
         }
 
+        this.notify(CursorService.ACTION_MOVE, this.selectingNote);
         return this.selectingNote;
     }
 
@@ -92,6 +101,7 @@ export default class CursorService {
         const currentSection = this.score.sections.find(section => _.includes(section.notes, note));
         this.selectingNote = note;
         this.selectingSection = currentSection;
+        this.notify(CursorService.ACTION_MOVE, this.selectingNote);
         return this.selectingNote;
     }
 }
