@@ -10,7 +10,8 @@ export default class Cursor extends Controller<CursorView> {
     private cursorService: CursorService;
 
     constructor(parentElement: Element, public score: Score) {
-        super(parentElement);
+        super();
+        this.view = new CursorView(parentElement);
         this.cursorService = new CursorService(score);
         this.cursorService.register(CursorService.ACTION_MOVE, (note: Note) => {
             this.view.moveTo(note);
@@ -28,11 +29,11 @@ export default class Cursor extends Controller<CursorView> {
             })
     }
 
-    public createView(parentElement: Element): CursorView {
-        return new CursorView(parentElement);
-    }
-
     public destory() {
+        Mousetrap.unbind('up');
+        Mousetrap.unbind('down');
+        Mousetrap.unbind('left');
+        Mousetrap.unbind('right');
         this.view.destory();
     }
 

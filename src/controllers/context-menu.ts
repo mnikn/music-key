@@ -8,7 +8,8 @@ export default class ContextMenu extends Controller<ContextMenuView> {
     public static ACTION_CHANGE_NOTE = 'change_note';
     private _changeNoteEvents: Messager = new Messager();
     constructor(parentElement: Element) {
-        super(parentElement);
+        super();
+        this.view = new ContextMenuView(parentElement);
         this.view.registerChangeNoteClick((key) => {
 
             let newNote = new Note();
@@ -19,10 +20,6 @@ export default class ContextMenu extends Controller<ContextMenuView> {
             // newNote.key = key;
             // this.editor.replaceSelectingNote(newNote);
         });
-    }
-
-    public createView(parentElement: Element): ContextMenuView {
-        return new ContextMenuView(parentElement);
     }
 
     public registerChangeNoteEvent(event: (note: Note) => void): void {

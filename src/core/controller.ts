@@ -2,26 +2,19 @@ import View from "./view";
 
 export default abstract class Controller<V extends View> {
     private _view: V;
-    private _parentElement: Element;
 
-    constructor(parentElement: Element, ...args) {
-        this._parentElement = parentElement;
-        this.beforeCreateView.apply(this, arguments);
-        this._view = this.createView.apply(this, [parentElement].concat(args));
-    }
-
-    protected beforeCreateView(...args): void {
-
-    }
-
-    protected abstract createView(parentElement: Element, ...args): V;
-
-    protected get parentElement(): Element {
-        return this._parentElement;
+    constructor() {
     }
 
     public get view(): V {
+        if (!this._view) {
+            throw 'The view has not been initialized, you must initialize view first!';
+        }
         return this._view;
+    }
+
+    public set view(view: V) {
+        this._view = view;
     }
 
     public destory(): void {

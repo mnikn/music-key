@@ -6,17 +6,21 @@ import Messager from 'src/utils/messager';
 import View from 'src/core/view';
 
 export default class ContextMenuView extends View {
-    private buttons: any[] = [];
     private _changeNoteEvents = new Messager();
     public element: d3.Selection<HTMLElement, {}, HTMLElement, any>;
 
     constructor(parentElement: Element) {
-        super(parentElement);
-        this.close();
-    }
+        super();
 
-    public beforeInitView(): void {
-        this.buttons = [{
+        let self = this;
+        let element = d3.select(parentElement).append('div')
+            .attr('id', 'context-menu')
+            .attr('class', 'btn-group-vertical dropright show')
+            .style('position', 'absolute')
+            .style('z-index', '100')
+            .style('visibility', 'hidden');
+
+        let buttons = [{
             id: 'changeNote',
             title: 'change note to',
             type: 'group',
@@ -29,16 +33,7 @@ export default class ContextMenuView extends View {
         }, {
             title: 'connectTo...'
         }];
-    }
-
-    public initView(parentElement: Element): Element {
-        let self = this;
-        let element = d3.select(parentElement).append('div')
-            .attr('id', 'context-menu')
-            .attr('class', 'btn-group-vertical dropright show')
-            .style('position', 'absolute')
-            .style('z-index', '100');
-        this.buttons.forEach(btn => {
+        buttons.forEach(btn => {
             if (btn.type === 'group') {
                 let groupElement = element.append('div')
                     .attr('class', 'btn-group')
@@ -73,21 +68,21 @@ export default class ContextMenuView extends View {
                     .text(btn.title);
             }
         });
-        return element.node();
+        this.initView(element.node());
     }
 
-    public registerChangeNoteClick(callback: (key: string) => void) {
+    public registerChangeNoteClick(callback: (key: string) => void): void {
         this._changeNoteEvents.register('changeNote', callback);
     }
 
-    public show(pos: Position) {
+    public show(pos: Position): void {
         this.element
             .style('left', `${pos.x + 10}px`)
             .style('top', `${pos.y + 20}px`)
             .style('visibility', 'visible');
     }
 
-    public close() {
+    public close(): void {
         this.element.style('visibility', 'hidden');
     }
 }

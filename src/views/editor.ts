@@ -1,4 +1,5 @@
 import * as d3 from 'd3';
+
 import SectionLayouter from 'src/views/section-layouter';
 import Score from 'src/models/score';
 import Position from 'src/utils/position';
@@ -8,25 +9,18 @@ import Note from 'src/models/note';
 
 export default class EditorView extends View {
     public static ACTION_CLICK_NOTE = 'click_note';
-    // public rootElement: d3.Selection<HTMLElement, {}, HTMLElement, any>;
-    // private toolbar: Toolbar;
-    // private contextMenu: ContextMenu;
     private sectionLayouter: SectionLayouter = new SectionLayouter();
     private noteEvents: Messager = new Messager();
 
     constructor(parentElement: Element) {
-        super(parentElement);
-        // this.toolbar = new Toolbar(parentElement);
-        // this.rootElement = d3.select(parentElement);
-    }
-
-    public initView(parentElement: Element): Element {
-        return d3.select(parentElement)
+        super();
+        const element = d3.select(parentElement)
             .append('svg')
             .attr('id', 'score-content')
             .style('height', '800px')
             .style('width', '100%')
             .node();
+        this.initView(element);
     }
 
     public refresh(score: Score) {
@@ -47,7 +41,6 @@ export default class EditorView extends View {
             .attr('x', '20px')
             .attr('y', '100px');
 
-
         this.element
             .append('text')
             .text(`${score.timeSignature.beatPerSections}/${score.timeSignature.notePerBeat}`)
@@ -56,7 +49,7 @@ export default class EditorView extends View {
             .attr('y', '100px');
     }
 
-    public render(score: Score) {
+    public render(score: Score): void {
         let self = this;
         const sections = score.sections;
         this.element.selectAll('.score-section').remove();
@@ -108,7 +101,7 @@ export default class EditorView extends View {
         this.sectionLayouter.relayout(seciontElement);
     }
 
-    public registerClickNoteEvent(callback: (note: Note) => void) {
+    public registerClickNoteEvent(callback: (note: Note) => void): void {
         this.noteEvents.register(EditorView.ACTION_CLICK_NOTE, callback);
     }
 }

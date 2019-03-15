@@ -6,19 +6,17 @@ import View from 'src/core/view';
 
 export default class CursorView extends View {
     constructor(private parentElement: Element) {
-        super(parentElement);
-    }
-
-    public initView(parentElement: Element): Element {
-        return d3.select(parentElement).append('path')
+        super();
+        const element = d3.select(parentElement).append('path')
             .attr('d', 'M0 10 c0 3.3 2.7 6 6 6 s6-2.7 6-6 S6 0,6 0 S0 6.7 0 10z')
             .attr('transform', `matrix(0.93 0 0 0.93 ${0} ${236})`)
             .attr('fill', 'red')
             .style('cursor', 'pointer')
-            .node() as Element;
+            .node();
+        this.initView(element);
     }
 
-    public moveTo(note: Note) {
+    public moveTo(note: Note): void {
         if (!note) return;
 
         const sectionElement = document.querySelector(`#score-section-${note.sectionId}`);

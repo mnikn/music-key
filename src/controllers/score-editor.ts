@@ -20,7 +20,9 @@ export default class ScoreEditor extends Controller<EditorView> {
     private _eventListeners: Map<string, any> = new Map<string, any>();
 
     constructor(parentElement: Element, score?: Score) {
-        super(parentElement, score);
+        super();
+        this.initData(score);
+        this.initViews(parentElement, score);
         this.initEvents();
     }
 
@@ -68,7 +70,7 @@ export default class ScoreEditor extends Controller<EditorView> {
         this.view.render(this.score);
     }
 
-    protected beforeCreateView(parentElement: Element, score: Score) {
+    private initData(score: Score): void {
         this.score = score;
         if (!score || score.sections.length === 0) {
             score = score ? this.score : new Score();
@@ -78,13 +80,12 @@ export default class ScoreEditor extends Controller<EditorView> {
         }
     }
 
-    protected createView(parentElement: Element, score: Score): EditorView {
+    private initViews(parentElement: Element, score: Score): void {
         this.toolbar = new Toolbar(parentElement);
-        const view = new EditorView(parentElement);
-        view.refresh(this.score);
+        this.view = new EditorView(parentElement);
+        this.view.refresh(this.score);
         this.contextMenu = new ContextMenu(parentElement);
-        this.cursor = new Cursor(view.element.node(), score);
-        return view;
+        this.cursor = new Cursor(this.view.element.node(), score);
     }
 
     private removeSelectingNote() {
