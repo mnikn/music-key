@@ -3,7 +3,7 @@ import * as d3 from 'd3';
 export default class Toolbar {
     public element: d3.Selection<HTMLElement, undefined, null, undefined>;
     private buttons: any[] = ['settings'];
-    constructor(parentElement: HTMLElement) {
+    constructor(parentElement: Element) {
 
         this.element = d3.create('div')
             .attr('class', 'btn-toolbar')

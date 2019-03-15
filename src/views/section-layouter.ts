@@ -1,13 +1,12 @@
-import { Selection } from 'd3';
+import * as d3 from 'd3';
 
-import { ScoreEditor } from './score-editor';
 import { Note } from 'src/models/note';
 
 export class SectionLayouter {
-    constructor(private editor: ScoreEditor) {
+    constructor() {
     }
 
-    public relayout(section: Selection<SVGSVGElement, any, SVGSVGElement, {}>) {
+    public relayout(section: d3.Selection<SVGSVGElement, any, any, any>) {
         // let perNote = this.editor.score.timeSignature.notePerBeat;
         section
             .selectAll('.score-note')

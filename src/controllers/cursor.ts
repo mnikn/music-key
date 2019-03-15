@@ -3,17 +3,38 @@ import CursorService from "src/services/cursor";
 import { Note } from "src/models/note";
 import { Score } from "src/models/score";
 import { Section } from "src/models/section";
+import { Mousetrap } from "src/utils/mousetrap";
+import Controller from "src/core/controller";
+import View from "src/core/view";
 
-export default class Cursor {
-    private view: CursorView;
+export default class Cursor extends Controller<CursorView> {
     private cursorService: CursorService;
 
-    constructor(parentElement: SVGElement, public score: Score) {
-        this.view = new CursorView(score, parentElement);
+    constructor(parentElement: Element, public score: Score) {
+        super(parentElement);
         this.cursorService = new CursorService(score);
         this.cursorService.register(CursorService.ACTION_MOVE, (note: Note) => {
             this.view.moveTo(note);
         });
+
+        Mousetrap
+            .shortcut('up', () => {
+                this.moveUp();
+            }).shortcut('down', () => {
+                this.moveDown();
+            }).shortcut('left', () => {
+                this.moveLeft();
+            }).shortcut('right', () => {
+                this.moveRight();
+            })
+    }
+
+    public createView(parentElement: Element): CursorView {
+        return new CursorView(parentElement);
+    }
+
+    public destory() {
+        this.view.destory();
     }
 
     public getSelectingNote(): Note {
@@ -27,7 +48,7 @@ export default class Cursor {
     public setSelectingNote(note: Note) {
         this.cursorService.setSelectingNote(note);
         this.view.moveTo(this.cursorService.getSelectingNote());
-    } 
+    }
 
     public moveLeft() {
         this.cursorService.moveLeft();

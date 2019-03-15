@@ -3,20 +3,19 @@ import * as d3 from 'd3';
 
 import { Position } from 'src/utils/position';
 import Messager from 'src/utils/messager';
+import View from 'src/core/view';
 
-export default class ContextMenuView {
+export default class ContextMenuView extends View {
     private buttons: any[] = [];
     private _changeNoteEvents = new Messager();
     public element: d3.Selection<HTMLElement, {}, HTMLElement, any>;
 
-    constructor(parentElement: HTMLElement) {
-        let self = this;
-        this.element = d3.select(parentElement).append('div')
-            .attr('id', 'context-menu')
-            .attr('class', 'btn-group-vertical dropright show')
-            .style('position', 'absolute')
-            .style('z-index', '100');
+    constructor(parentElement: Element) {
+        super(parentElement);
+        this.close();
+    }
 
+    public beforeInitView(): void {
         this.buttons = [{
             id: 'changeNote',
             title: 'change note to',
@@ -30,10 +29,18 @@ export default class ContextMenuView {
         }, {
             title: 'connectTo...'
         }];
+    }
 
+    public initView(parentElement: Element): Element {
+        let self = this;
+        let element = d3.select(parentElement).append('div')
+            .attr('id', 'context-menu')
+            .attr('class', 'btn-group-vertical dropright show')
+            .style('position', 'absolute')
+            .style('z-index', '100');
         this.buttons.forEach(btn => {
             if (btn.type === 'group') {
-                let groupElement = this.element.append('div')
+                let groupElement = element.append('div')
                     .attr('class', 'btn-group')
                     .attr('role', 'group');
                 groupElement.append('button')
@@ -58,7 +65,7 @@ export default class ContextMenuView {
                         self.close();
                     });
             } else {
-                this.element.append('button')
+                element.append('button')
                     .attr('id', btn.id)
                     .attr('class', 'btn btn-secondary')
                     .attr('type', 'button')
@@ -66,8 +73,7 @@ export default class ContextMenuView {
                     .text(btn.title);
             }
         });
-
-        this.close();
+        return element.node();
     }
 
     public registerChangeNoteClick(callback: (key: string) => void) {
