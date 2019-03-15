@@ -1,89 +1,27 @@
-import * as d3 from 'd3';
 import * as _ from 'lodash';
 
 import Cursor from '../controllers/cursor';
-import { Score } from 'src/models/score';
-import { Section } from 'src/models/section';
-import { Note } from 'src/models/note';
-import { Mousetrap } from 'src/utils/mousetrap';
+import Score from 'src/models/score';
+import Section from 'src/models/section';
+import Note from 'src/models/note';
+import Mousetrap from 'src/utils/mousetrap';
 import ContextMenu from 'src/controllers/context-menu';
 import generateId from 'src/utils/id-generator';
 import Toolbar from './toolbar';
 import '../../static/css/style.css';
-import view from 'src/views/editor';
 import Controller from 'src/core/controller';
 import EditorView from 'src/views/editor';
 
-export class ScoreEditor extends Controller<view> {
-    public rootElement: d3.Selection<HTMLElement, {}, HTMLElement, any>;
-    public element: d3.Selection<SVGSVGElement, {}, HTMLElement, any>;
+export default class ScoreEditor extends Controller<EditorView> {
     public cursor: Cursor;
     private toolbar: Toolbar;
     private contextMenu: ContextMenu;
     private score: Score;
+    private _eventListeners: Map<string, any> = new Map<string, any>();
 
-    constructor(parentElement: HTMLElement, score?: Score) {
+    constructor(parentElement: Element, score?: Score) {
         super(parentElement, score);
-        document.oncontextmenu = (event) => {
-            let clickElement: any = event.target;
-            if (clickElement.getAttribute('class') === 'score-note') {
-                let clickNote = this.score.notes.find(note => note.id === parseInt(clickElement.getAttribute('data-id')));
-                this.cursor.moveTo(clickNote)
-            }
-            this.contextMenu.show({ x: event.x, y: event.y });
-            return false;
-        };
-        document.onclick = (event: any) => {
-            let isContextMenuClick = false;
-            _.forEach(event.path, element => {
-                if (element.id === this.contextMenu.view.element.node().id) {
-                    isContextMenuClick = true;
-                }
-            });
-
-            if (!isContextMenuClick) {
-                this.contextMenu.close();
-            }
-            return true;
-        }
-
-        Mousetrap.shortcut('backspace', () => {
-            this.removeSelectingNote();
-        });
-
-        window.addEventListener('keydown', this.handleKeydown.bind(this));
-        window.addEventListener('resize', () => {
-            this.view.render(this.score);
-            this.cursor.moveTo(this.cursor.getSelectingNote());
-        });
-
-        this.contextMenu = new ContextMenu(parentElement);
-
-        this.cursor = new Cursor(this.view.element.node(), score);
-
-        this.contextMenu.registerChangeNoteEvent((note) => {
-            this.replaceSelectingNote(note);
-        })
-        this.view.registerClickNoteEvent(note => {
-            this.cursor.moveTo(note);
-        });
-    }
-
-    public beforeCreateView(parentElement: Element, score: Score) {
-        this.toolbar = new Toolbar(parentElement);
-        this.score = score;
-        if (!score || score.sections.length === 0) {
-            score = score ? this.score : new Score();
-            const sections = this.score.sections;
-            sections.push(new Section(generateId()));
-            sections[0].notes.push(new Note(generateId(), sections[0].id));
-        }
-    }
-
-    public createView(parentElement: Element): view {
-        const view = new EditorView(parentElement);
-        view.refresh(this.score);
-        return view;
+        this.initEvents();
     }
 
     public destory() {
@@ -93,6 +31,10 @@ export class ScoreEditor extends Controller<view> {
         if (this.cursor) {
             this.cursor.destory();
         }
+        this._eventListeners.forEach((value, key) => {
+            document.removeEventListener(key, value);
+        });
+        Mousetrap.unbind('backspace');
     }
 
     public handleKeydown(event) {
@@ -126,6 +68,25 @@ export class ScoreEditor extends Controller<view> {
         this.view.render(this.score);
     }
 
+    protected beforeCreateView(parentElement: Element, score: Score) {
+        this.score = score;
+        if (!score || score.sections.length === 0) {
+            score = score ? this.score : new Score();
+            const sections = this.score.sections;
+            sections.push(new Section(generateId()));
+            sections[0].notes.push(new Note(generateId(), sections[0].id));
+        }
+    }
+
+    protected createView(parentElement: Element, score: Score): EditorView {
+        this.toolbar = new Toolbar(parentElement);
+        const view = new EditorView(parentElement);
+        view.refresh(this.score);
+        this.contextMenu = new ContextMenu(parentElement);
+        this.cursor = new Cursor(view.element.node(), score);
+        return view;
+    }
+
     private removeSelectingNote() {
         if (!this.cursor.getSelectingNote()) return;
 
@@ -139,5 +100,46 @@ export class ScoreEditor extends Controller<view> {
         }
         this.cursor.moveTo(_.last(selectingSection.notes));
         this.view.render(this.score);
+    }
+
+    private initEvents(): void {
+        Mousetrap.shortcut('backspace', () => {
+            this.removeSelectingNote();
+        });
+
+        document.oncontextmenu = (event) => {
+            let clickElement: any = event.target;
+            if (clickElement.getAttribute('class') === 'score-note') {
+                let clickNote = this.score.notes.find(note => note.id === parseInt(clickElement.getAttribute('data-id')));
+                this.cursor.moveTo(clickNote)
+            }
+            this.contextMenu.show({ x: event.x, y: event.y });
+            return false;
+        };
+        this._eventListeners.set('click', document.addEventListener('click', (event: any) => {
+            let isContextMenuClick = false;
+            _.forEach(event.path, element => {
+                if (element.id === this.contextMenu.view.element.node().id) {
+                    isContextMenuClick = true;
+                }
+            });
+
+            if (!isContextMenuClick) {
+                this.contextMenu.close();
+            }
+            return true;
+        }));
+        this._eventListeners.set('keydown', document.addEventListener('keydown', this.handleKeydown.bind(this)));
+        this._eventListeners.set('resize', document.addEventListener('resize', () => {
+            this.view.render(this.score);
+            this.cursor.moveTo(this.cursor.getSelectingNote());
+        }));
+
+        this.contextMenu.registerChangeNoteEvent((note) => {
+            this.replaceSelectingNote(note);
+        })
+        this.view.registerClickNoteEvent(note => {
+            this.cursor.moveTo(note);
+        });
     }
 }

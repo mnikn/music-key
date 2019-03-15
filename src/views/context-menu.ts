@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 import * as d3 from 'd3';
 
-import { Position } from 'src/utils/position';
+import Position from 'src/utils/position';
 import Messager from 'src/utils/messager';
 import View from 'src/core/view';
 

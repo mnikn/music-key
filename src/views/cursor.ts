@@ -1,7 +1,7 @@
 import * as d3 from 'd3';
 import * as _ from 'lodash';
 
-import { Note } from 'src/models/note';
+import Note from 'src/models/note';
 import View from 'src/core/view';
 
 export default class CursorView extends View {

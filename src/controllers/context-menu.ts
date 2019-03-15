@@ -1,6 +1,6 @@
-import { Note } from "src/models/note";
+import Note from "src/models/note";
 import ContextMenuView from 'src/views/context-menu';
-import { Position } from "src/utils/position";
+import Position from "src/utils/position";
 import Controller from "src/core/controller";
 import Messager from "src/utils/messager";
 

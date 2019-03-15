@@ -1,10 +1,10 @@
 import * as _ from 'lodash';
 
-import { Section } from './section';
-import { TimeSignature } from './time-signature';
-import { Note } from './note';
+import Section from './section';
+import TimeSignature from './time-signature';
+import Note from './note';
 
-export class Score {
+export default class Score {
     public sections: Section[] = [];
     public name: string;
     public tonality: 'C' | 'D' | 'E' | 'F' | 'G' | 'A' | 'B' = 'C';

@@ -1,6 +1,6 @@
-import { Note } from './note';
+import Note from "./note";
 
-export class Section {
+export default class Section {
     public notes: Note[] = [];
     constructor(public id?: number) { }
 

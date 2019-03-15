@@ -1,7 +1,7 @@
 import test from 'ava';
-import { Score } from '../../src/models/score';
-import { Section } from '../../src/models/section';
-import { Note } from '../../src/models/note';
+import Score from '../../src/models/score';
+import Section from '../../src/models/section';
+import Note from '../../src/models/note';
 import CursorService from '../../src/services/cursor';
 
 test('moveRight', t => {

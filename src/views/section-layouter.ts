@@ -1,8 +1,8 @@
 import * as d3 from 'd3';
 
-import { Note } from 'src/models/note';
+import Note from 'src/models/note';
 
-export class SectionLayouter {
+export default class SectionLayouter {
     constructor() {
     }
 

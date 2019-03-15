@@ -1,9 +1,9 @@
 import * as _ from 'lodash';
 
-import { Note } from "src/models/note";
-import { Section } from "src/models/section";
-import { Score } from "src/models/score";
+import Section from "src/models/section";
+import Score from "src/models/score";
 import Service from '../core/service';
+import Note from 'src/models/note';
 
 export default class CursorService extends Service {
     private selectingNote: Note;

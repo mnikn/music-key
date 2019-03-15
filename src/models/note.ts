@@ -1,4 +1,4 @@
-export class Note {
+export default class Note {
     // key range: 1-7, use * for sharp, eg: 4*: 4.5, *4: 3.5
     public key: string;
     public sectionId: number;

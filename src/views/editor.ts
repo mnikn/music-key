@@ -1,10 +1,10 @@
 import * as d3 from 'd3';
-import { SectionLayouter } from 'src/views/section-layouter';
-import { Score } from 'src/models/score';
-import { Position } from 'src/utils/position';
+import SectionLayouter from 'src/views/section-layouter';
+import Score from 'src/models/score';
+import Position from 'src/utils/position';
 import View from 'src/core/view';
 import Messager from 'src/utils/messager';
-import { Note } from 'src/models/note';
+import Note from 'src/models/note';
 
 export default class EditorView extends View {
     public static ACTION_CLICK_NOTE = 'click_note';

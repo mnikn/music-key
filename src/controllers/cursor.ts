@@ -1,11 +1,10 @@
 import CursorView from "src/views/cursor";
 import CursorService from "src/services/cursor";
-import { Note } from "src/models/note";
-import { Score } from "src/models/score";
-import { Section } from "src/models/section";
-import { Mousetrap } from "src/utils/mousetrap";
+import Note from "src/models/note";
+import Score from "src/models/score";
+import Section from "src/models/section";
+import Mousetrap from "src/utils/mousetrap";
 import Controller from "src/core/controller";
-import View from "src/core/view";
 
 export default class Cursor extends Controller<CursorView> {
     private cursorService: CursorService;
