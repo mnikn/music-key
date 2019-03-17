@@ -35,6 +35,7 @@ export default class ScoreEditor extends Controller<EditorView> {
             document.removeEventListener(key, value);
         });
         Mousetrap.unbind('backspace');
+        document.oncontextmenu = () => true;
     }
 
     public handleKeydown(event) {
@@ -104,15 +105,8 @@ export default class ScoreEditor extends Controller<EditorView> {
             this.removeSelectingNote();
         });
 
-        document.oncontextmenu = (event) => {
-            let clickElement: any = event.target;
-            if (clickElement.getAttribute('class') === 'score-note') {
-                let clickNote = this.score.notes.find(note => note.id === parseInt(clickElement.getAttribute('data-id')));
-                this.cursor.moveTo(clickNote)
-            }
-            this.contextMenu.show({ x: event.x, y: event.y });
-            return false;
-        };
+        document.oncontextmenu = () => false;
+
         this._eventListeners.set('click', document.addEventListener('click', (event: any) => {
             let isContextMenuClick = false;
             _.forEach(event.path, element => {
@@ -137,6 +131,10 @@ export default class ScoreEditor extends Controller<EditorView> {
         })
         this.view.registerClickNoteEvent(note => {
             this.cursor.moveTo(note);
+        });
+        this.view.registerShowMenuEvent((note: Note, pos: any) => {
+                this.cursor.moveTo(note)
+                this.contextMenu.show({ x: pos.x, y: pos.y });
         });
     }
 }

@@ -9,6 +9,7 @@ import Note from 'src/models/note';
 
 export default class EditorView extends View {
     public static ACTION_CLICK_NOTE = 'click_note';
+    public static ACTION_SHOW_MENU = 'show_menu';
     private sectionLayouter: SectionLayouter = new SectionLayouter();
     private noteEvents: Messager = new Messager();
 
@@ -64,20 +65,28 @@ export default class EditorView extends View {
             .data(sections);
 
         // render note
-        seciontElement
+        const noteElements = seciontElement
             .selectAll('score-note')
             .data(section => section.notes)
-            .enter().append('text')
-            .text(note => note.key)
+            .enter().append('svg')
             .attr('id', note => `score-note-${note.id}`)
             .attr('data-id', note => note.id)
             .attr('class', `score-note`)
-            .style('font-size', `16px`)
             .style('cursor', 'pointer')
             .on('click', function (note) {
                 self.noteEvents.notify(EditorView.ACTION_CLICK_NOTE, note);
-                // cursor.moveTo(note);
+            })
+            .on('contextmenu', function (data) {
+                self.noteEvents.notify(EditorView.ACTION_SHOW_MENU, data,  {x: d3.event.x, y: d3.event.y});
+                return false;
             });
+
+        noteElements
+            .append('text')
+            .text(note => note.key)
+            .style('font-size', `16px`)
+            .attr('y', '50%');
+
 
         // render bar line
         seciontElement
@@ -95,5 +104,9 @@ export default class EditorView extends View {
 
     public registerClickNoteEvent(callback: (note: Note) => void): void {
         this.noteEvents.register(EditorView.ACTION_CLICK_NOTE, callback);
+    }
+
+    public registerShowMenuEvent(callback: (note: Note, pos: any) => void): void {
+        this.noteEvents.register(EditorView.ACTION_SHOW_MENU, callback);
     }
 }

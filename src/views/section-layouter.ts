@@ -15,6 +15,6 @@ export default class SectionLayouter {
                 // let offset = 100 / (perNote / section.notes.length);
                 return `${i * 25 + 5}%`;
             })
-            .attr('y', '50%');
+            .attr('y', '0');
     }
 }
