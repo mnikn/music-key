@@ -18,6 +18,8 @@ export default abstract class Controller<V extends View> {
     }
 
     public destory(): void {
-        this.view.destory();
+        if (this.view) {
+            this.view.destory();
+        }
     }
 }

@@ -12,41 +12,33 @@ export default class EditorView extends View {
     private sectionLayouter: SectionLayouter = new SectionLayouter();
     private noteEvents: Messager = new Messager();
 
-    constructor(parentElement: Element) {
+    constructor(parentElement: Element, score: Score) {
         super();
         const element = d3.select(parentElement)
             .append('svg')
             .attr('id', 'score-content')
             .style('height', '800px')
-            .style('width', '100%')
-            .node();
-        this.initView(element);
-    }
-
-    public refresh(score: Score) {
-        this.element.selectAll('*').remove();
-
-        this.element
+            .style('width', '100%');
+        element
             .append('text')
             .text(`${score.name}`)
             .style('font-size', '32px')
             .style('font-weight', 'bold')
             .attr('x', '43%')
             .attr('y', '50px');
-
-        this.element
+        element
             .append('text')
             .text(`1 = ${score.tonality}`)
             .style('font-size', '16px')
             .attr('x', '20px')
             .attr('y', '100px');
-
-        this.element
+        element
             .append('text')
             .text(`${score.timeSignature.beatPerSections}/${score.timeSignature.notePerBeat}`)
             .style('font-size', '16px')
             .attr('x', '80px')
             .attr('y', '100px');
+        this.initView(element.node());
     }
 
     public render(score: Score): void {

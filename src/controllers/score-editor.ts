@@ -26,10 +26,8 @@ export default class ScoreEditor extends Controller<EditorView> {
         this.initEvents();
     }
 
-    public destory() {
-        if (this.view) {
-            this.view.destory();
-        }
+    public destory(): void {
+        super.destory();
         if (this.cursor) {
             this.cursor.destory();
         }
@@ -71,19 +69,17 @@ export default class ScoreEditor extends Controller<EditorView> {
     }
 
     private initData(score: Score): void {
-        this.score = score;
         if (!score || score.sections.length === 0) {
-            score = score ? this.score : new Score();
-            const sections = this.score.sections;
-            sections.push(new Section(generateId()));
-            sections[0].notes.push(new Note(generateId(), sections[0].id));
+            score = score ? score : new Score();
+            score.sections.push(new Section(generateId()));
+            score.sections[0].notes.push(new Note(generateId(), score.sections[0].id));
         }
+        this.score = Object.assign(new Score(), score);
     }
 
     private initViews(parentElement: Element, score: Score): void {
         this.toolbar = new Toolbar(parentElement);
-        this.view = new EditorView(parentElement);
-        this.view.refresh(this.score);
+        this.view = new EditorView(parentElement, score);
         this.contextMenu = new ContextMenu(parentElement);
         this.cursor = new Cursor(this.view.element.node(), score);
     }
